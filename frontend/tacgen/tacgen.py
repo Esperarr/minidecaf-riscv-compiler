@@ -222,6 +222,8 @@ class TACGen(Visitor[TACFuncEmitter, None]):
 
         op = {
             node.UnaryOp.Neg: tacop.TacUnaryOp.NEG,
+            node.UnaryOp.BitNot: tacop.TacUnaryOp.BIT_NOT,
+            node.UnaryOp.LogicNot: tacop.TacUnaryOp.NOT,
             # You can add unary operations here.
         }[expr.op]
         expr.setattr("val", mv.visitUnary(op, expr.operand.getattr("val")))
@@ -233,6 +235,10 @@ class TACGen(Visitor[TACFuncEmitter, None]):
         op = {
             node.BinaryOp.Add: tacop.TacBinaryOp.ADD,
             node.BinaryOp.LogicOr: tacop.TacBinaryOp.LOR,
+            node.BinaryOp.Sub: tacop.TacBinaryOp.SUB,
+            node.BinaryOp.Mul: tacop.TacBinaryOp.MUL,
+            node.BinaryOp.Div: tacop.TacBinaryOp.DIV,
+            node.BinaryOp.Mod: tacop.TacBinaryOp.MOD,
             # You can add binary operations here.
         }[expr.op]
         expr.setattr(
