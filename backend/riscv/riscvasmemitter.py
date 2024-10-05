@@ -76,7 +76,7 @@ class RiscvAsmEmitter():
             op = {
                 TacUnaryOp.NEG: RvUnaryOp.NEG,
                 TacUnaryOp.BIT_NOT: RvUnaryOp.NOT,
-                TacUnaryOp.NOT: RvUnaryOp.SQEZ
+                TacUnaryOp.NOT: RvUnaryOp.SEQZ
                 # You can add unary operations here.
             }[instr.op]
             self.seq.append(Riscv.Unary(op, instr.dst, instr.operand))
