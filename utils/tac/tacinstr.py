@@ -113,7 +113,7 @@ class Binary(TACInstr):
             TacBinaryOp.SGT: ">",
             TacBinaryOp.GEQ: ">=",
             TacBinaryOp.AND: "&&",
-            TacBinaryOp.OR: "||",
+            TacBinaryOp.LOR: "||",
         }[self.op]
         return "%s = (%s %s %s)" % (self.dst, self.lhs, opStr, self.rhs)
 

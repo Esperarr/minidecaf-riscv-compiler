@@ -89,6 +89,22 @@ class RiscvAsmEmitter():
             if instr.op == TacBinaryOp.LOR:
                 self.seq.append(Riscv.Binary(RvBinaryOp.OR, instr.dst, instr.lhs, instr.rhs))
                 self.seq.append(Riscv.Unary(RvUnaryOp.SNEZ, instr.dst, instr.dst))
+            elif instr.op == TacBinaryOp.EQU:
+                self.seq.append(Riscv.Binary(RvBinaryOp.SUB, instr.dst,instr.lhs, instr.rhs))
+                self.seq.append(Riscv.Unary(RvUnaryOp.SQEZ, instr.dst, instr.dst))
+            elif instr.op == TacBinaryOp.NEQ:
+                self.seq.append(Riscv.Binary(RvBinaryOp.SUB, instr.dst, instr.lhs, instr.rhs))
+                self.seq.append(Riscv.Unary(RvUnaryOp.SNEZ, instr.dst, instr.dst))
+            elif instr.op == TacBinaryOp.LEQ:
+                self.seq.append(Riscv.Binary(RvBinaryOp.SGT, instr.dst, instr.lhs, instr.rhs))
+                self.seq.append(Riscv.Unary(RvUnaryOp.SQEZ, instr.dst, instr.dst))
+            elif instr.op == TacBinaryOp.GEQ:
+                self.seq.append(Riscv.Binary(RvBinaryOp.SLT, instr.dst, instr.lhs, instr.rhs))
+                self.seq.append(Riscv.Unary(RvUnaryOp.SQEZ, instr.dst, instr.dst))
+            elif instr.op == TacBinaryOp.AND:
+                self.seq.append(Riscv.Unary(RvUnaryOp.SNEZ, instr.rhs, instr.rhs))
+                self.seq.append(Riscv.Unary(RvUnaryOp.SNEZ, instr.lhs, instr.lhs))
+                self.seq.append(Riscv.Binary(RvBinaryOp.AND, instr.dst, instr.rhs, instr.lhs))
             else:
                 op = {
                     TacBinaryOp.ADD: RvBinaryOp.ADD,
@@ -96,6 +112,8 @@ class RiscvAsmEmitter():
                     TacBinaryOp.MUL: RvBinaryOp.MUL,
                     TacBinaryOp.DIV: RvBinaryOp.DIV,
                     TacBinaryOp.MOD: RvBinaryOp.REM,
+                    TacBinaryOp.SLT: RvBinaryOp.SLT,
+                    TacBinaryOp.SGT: RvBinaryOp.SGT
                     # You can add binary operations here.
                 }[instr.op]
                 self.seq.append(Riscv.Binary(op, instr.dst, instr.lhs, instr.rhs))
