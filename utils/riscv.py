@@ -17,7 +17,7 @@ MAX_INT: Final[int] = 0x7FFF_FFFF
 class RvUnaryOp(Enum):
     NEG = auto()
     SNEZ = auto()
-    SQEZ = auto()
+    SEQZ = auto()
     NOT = auto()
 
 @unique
