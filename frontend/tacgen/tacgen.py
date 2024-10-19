@@ -184,8 +184,8 @@ class TACGen(Visitor[TACFuncEmitter, None]):
         2. Use mv.visitAssignment to emit an assignment instruction.
         3. Set the 'val' attribute of expr as the value of assignment instruction.
         """
-        expr.lhs.accept(self, mv)
         expr.rhs.accept(self, mv)
+        expr.lhs.accept(self, mv)
         val=mv.visitAssignment(expr.lhs.getattr("val"), expr.rhs.getattr("val"))
         expr.setattr("val", val)
         # raise NotImplementedError

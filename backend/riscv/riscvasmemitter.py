@@ -103,9 +103,10 @@ class RiscvAsmEmitter():
                 self.seq.append(Riscv.Binary(RvBinaryOp.SLT, instr.dst, instr.lhs, instr.rhs))
                 self.seq.append(Riscv.Unary(RvUnaryOp.SEQZ, instr.dst, instr.dst))
             elif instr.op == TacBinaryOp.AND:
-                self.seq.append(Riscv.Unary(RvUnaryOp.SNEZ, instr.rhs, instr.rhs))
-                self.seq.append(Riscv.Unary(RvUnaryOp.SNEZ, instr.lhs, instr.lhs))
-                self.seq.append(Riscv.Binary(RvBinaryOp.AND, instr.dst, instr.rhs, instr.lhs))
+                self.seq.append(Riscv.Unary(RvUnaryOp.SNEZ, instr.dst, instr.lhs))
+                self.seq.append(Riscv.Binary(RvBinaryOp.SUB, instr.dst, Riscv.ZERO, instr.dst))
+                self.seq.append(Riscv.Binary(RvBinaryOp.AND, instr.dst, instr.dst, instr.rhs))
+                self.seq.append(Riscv.Unary(RvUnaryOp.SNEZ, instr.dst, instr.dst))
             else:
                 op = {
                     TacBinaryOp.ADD: RvBinaryOp.ADD,
