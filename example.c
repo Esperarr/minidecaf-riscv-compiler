@@ -1,4 +1,6 @@
 int main() {
     int x = 2024;
-    return x;
+    int y=11;
+    int z=x&&y;
+    return z;
 }

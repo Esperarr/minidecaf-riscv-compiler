@@ -114,6 +114,7 @@ class Namer(Visitor[Scope, None]):
         if symbol is None:
             raise DecafUndefinedVarError(expr.lhs.value)
         else:
+            expr.lhs.setattr('symbol',symbol)
             expr.lhs.accept(self,ctx)
             expr.rhs.accept(self,ctx)
         # raise NotImplementedError
