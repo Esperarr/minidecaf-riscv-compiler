@@ -1,9 +1,10 @@
-int main() {
-    int x = 1;
-    {
-        x = 2; 
-        int x = 3;
-    }
-    x = 4;
-    return x;
-}
+int main(){
+       int a = 2;
+       if (a < 3) {
+           {
+               int a = 3;
+               return a;
+           }
+           return a;
+       }
+      }
