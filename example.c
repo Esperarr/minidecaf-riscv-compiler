@@ -1,5 +1,7 @@
 int main() {
-    int x = 1;
-    if (x) x = 2; else x = 3;
-    return x;
+    int a = 0;
+
+    for (a = 0; a < 3; a = a + 1)
+        a = a * 2;
+    return a;
 }

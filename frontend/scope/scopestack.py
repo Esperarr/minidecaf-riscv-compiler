@@ -10,6 +10,15 @@ class ScopeStack:
         self.scopes.append(GlobalScope)
         self.current_scope: Scope = GlobalScope# top
         self.global_scope: Scope = GlobalScope# bottom
+        self.loop_num = 0
+    def start_loop(self) -> None:
+        self.loop_num += 1
+    def end_loop(self) -> None:
+        self.loop_num -= 1
+    def get_loop_num(self) -> int:
+        return self.loop_num
+    def in_loop(self) -> bool:
+        return self.loop_num > 0
     def open(self, scope: Scope) -> None:
         self.scopes.append(scope)
         self.current_scope = scope
