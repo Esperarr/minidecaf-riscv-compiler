@@ -116,8 +116,8 @@ def p_while(p):
 
 def p_for(p):
     """
-    statement_matched : For LParen init_expression Semi expression Semi expression RParen statement_matched
-    statement_unmatched : For LParen init_expression Semi expression Semi expression RParen statement_unmatched
+    statement_matched : For LParen init_expression Semi opt_expression Semi opt_expression RParen statement_matched
+    statement_unmatched : For LParen init_expression Semi opt_expression Semi opt_expression RParen statement_unmatched
     """
     p[0] = For(p[3], p[5], p[7], p[9])
 
@@ -125,6 +125,7 @@ def p_for_init_expression(p):
     """
     init_expression : declaration
     init_expression : expression
+    init_expression : empty
     """
     p[0] = p[1]
 

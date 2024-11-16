@@ -237,18 +237,21 @@ class TACGen(Visitor[TACFuncEmitter, None]):
         breakLabel = mv.freshLabel()
         mv.openLoop(breakLabel, loopLabel)
         #init
-        stmt.init.accept(self, mv)
+        if stmt.init:
+            stmt.init.accept(self, mv)
         #_L1
         #begin
         mv.visitLabel(beginLabel)
-        stmt.cond.accept(self, mv)
-        mv.visitCondBranch(tacop.CondBranchOp.BEQ, stmt.cond.getattr("val"), breakLabel)
+        if stmt.cond:
+            stmt.cond.accept(self, mv)
+            mv.visitCondBranch(tacop.CondBranchOp.BEQ, stmt.cond.getattr("val"), breakLabel)
         #body
         stmt.body.accept(self, mv)
         #_L2
         #update
         mv.visitLabel(loopLabel)
-        stmt.update.accept(self, mv)
+        if stmt.update:
+            stmt.update.accept(self, mv)
         mv.visitBranch(beginLabel)
         #_L3
         mv.visitLabel(breakLabel)

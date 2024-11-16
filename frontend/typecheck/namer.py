@@ -64,9 +64,12 @@ class Namer(Visitor[ScopeStack, None]):
     """
     def visitFor(self, stmt: For, ctx: ScopeStack) -> None:
         ctx.open(Scope(ScopeKind.LOCAL))
-        stmt.init.accept(self, ctx)
-        stmt.cond.accept(self, ctx)
-        stmt.update.accept(self, ctx)
+        if stmt.init:
+            stmt.init.accept(self, ctx)
+        if stmt.cond:
+            stmt.cond.accept(self, ctx)
+        if stmt.update:
+            stmt.update.accept(self, ctx)
         ctx.start_loop()
         stmt.body.accept(self, ctx)
         ctx.end_loop()
