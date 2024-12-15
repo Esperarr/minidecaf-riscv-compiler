@@ -6,7 +6,7 @@ Modify this file if you want to add a new AST node.
 
 from __future__ import annotations
 
-from typing import Any, Generic, Optional, TypeVar, Union
+from typing import Any, Generic, Optional, TypeVar, Union, List
 
 from frontend.type import INT, DecafType
 from utils import T, U
@@ -75,17 +75,20 @@ class Function(Node):
         self,
         ret_t: TypeLiteral,
         ident: Identifier,
+        params: List[Parameter],
         body: Block,
     ) -> None:
         super().__init__("function")
         self.ret_t = ret_t
         self.ident = ident
+        self.params = params
         self.body = body
 
     def __getitem__(self, key: int) -> Node:
         return (
             self.ret_t,
             self.ident,
+            *self.params,
             self.body,
         )[key]
 
@@ -94,7 +97,36 @@ class Function(Node):
 
     def accept(self, v: Visitor[T, U], ctx: T):
         return v.visitFunction(self, ctx)
-
+    
+class Parameter(Node):
+    """
+    AST node that represents a parameters
+    """
+    def __init__(self, var_type: TypeLiteral, ident: Identifier):
+        super().__init__("parameter")
+        self.var_type=var_type
+        self.ident=ident
+    def __getitem__(self, key: int) -> Node:
+        return (self.var_type, self.ident)[key]
+    def __len__(self) -> int:
+        return 2
+    def accept(self, v: Visitor[T, U], ctx: T):
+        return v.visitParameter(self, ctx)
+    
+class Call(Node):
+    """
+    AST node that represents a call
+    """
+    def __init__(self, ident: Identifier, argument_list: List[Parameter]):
+        super().__init__("call")
+        self.ident=ident
+        self.argument_list=argument_list
+    def __getitem__(self, key: int) -> Node:
+        return (self.ident, *self.argument_list)[key]
+    def __len__(self) -> int:
+        return len(self.argument_list)+1
+    def accept(self, v: Visitor[T, U], ctx: T):
+        return v.visitCall(self, ctx)
 
 class Statement(Node):
     """

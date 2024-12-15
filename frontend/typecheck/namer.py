@@ -42,7 +42,47 @@ class Namer(Visitor[ScopeStack, None]):
             func.accept(self, ctx)
 
     def visitFunction(self, func: Function, ctx: ScopeStack) -> None:
-        func.body.accept(self, ctx)
+        func_name=func.ident.value
+        func_type=func.ret_t
+        func_param_list=func.params
+        func_body=func.body
+        conflict_symbol=ctx.lookup_all(func_name)
+        if conflict_symbol:# func already decleared
+            if isinstance(conflict_symbol, FuncSymbol) and conflict_symbol.isFunc():
+                if conflict_symbol.type == func_type:# same type
+                    if conflict_symbol.defined == True:# func already defined
+                        raise DecafDeclConflictError(func_name)
+                    else:# func not defined yet
+                        if func_body:
+                            conflict_symbol.defined = True
+                else:# different type
+                    raise DecafDeclConflictError(func_name)
+        else:# func not decleared yet
+            func_symbol = FuncSymbol(func_type, func_name, GlobalScope)
+            for param in func_param_list:
+                param_type=param.var_type
+                func_symbol.addParaType(param_type)
+            GlobalScope.declare(func_symbol)
+            func.setattr('symbol', func_symbol)
+            if func_body:# define func
+                func_symbol.defined = True
+        ctx.open(Scope(ScopeKind.LOCAL))
+        for param in func_param_list:
+            param.accept(self, ctx)
+        for child in func_body:
+            child.accept(self, ctx)
+        ctx.close()
+
+
+    def visitCall(self, call: Call, ctx: ScopeStack) -> None:
+        func_symbol=ctx.lookup_all(call.ident.value)
+        if not func_symbol or not isinstance(func_symbol, FuncSymbol) or not func_symbol.isFunc() or func_symbol.defined == False:
+            raise DecafUndefinedFuncError(call.ident.value)
+        if not (len(call.argument_list) == func_symbol.parameterNum()):
+           raise DecafBadFuncCallError
+        call.ident.setattr('symbol', func_symbol)
+        for arg in call.argument_list:
+            arg.accept(self, ctx)
 
     def visitBlock(self, block: Block, ctx: ScopeStack) -> None:
         ctx.open(Scope(ScopeKind.LOCAL))
@@ -128,6 +168,20 @@ class Namer(Visitor[ScopeStack, None]):
             if decl.init_expr is not None:
                 decl.init_expr.accept(self,ctx)
         # raise NotImplementedError
+
+    def visitParameter(self, param: Parameter, ctx: ScopeStack) -> None:
+        """
+        1. Use ctx.lookup to find if a variable with the same name has been declared.
+        2. If not, build a new VarSymbol, and put it into the current scope using ctx.declare.
+        3. Set the 'symbol' attribute of decl.
+        """
+        symbol=ctx.lookup_current(param.ident.value) # lookup in current zone
+        if symbol is not None:
+            raise DecafDeclConflictError(param.ident.value)
+        else:
+            symbol=VarSymbol(param.ident.value,param.var_type,False)
+            ctx.declare(symbol)
+            param.setattr('symbol',symbol)
 
     def visitAssignment(self, expr: Assignment, ctx: ScopeStack) -> None:
         """

@@ -41,10 +41,21 @@ def p_empty(p: yacc.YaccProduction):
 
 def p_program(p):
     """
-    program : function
+    program : function_list
     """
     p[0] = Program(p[1])
 
+def p_function_list(p):
+    """
+    function_list : function_list function
+    """
+    p[0] = p[1] + [p[2]]
+
+def p_function_list_empty(p):
+    """
+    function_list : empty
+    """
+    p[0] = []
 
 def p_type(p):
     """
@@ -55,9 +66,63 @@ def p_type(p):
 
 def p_function_def(p):
     """
-    function : type Identifier LParen RParen LBrace block RBrace
+    function : type Identifier LParen param_list RParen LBrace block RBrace
     """
-    p[0] = Function(p[1], p[2], p[6])
+    p[0] = Function(p[1], p[2], p[4], p[7])
+
+def p_function_declear(p):
+    """
+    function : type Identifier LParen param_list RParen Semi
+    """
+    p[0] = Function(p[1], p[2], p[4], None)
+
+def p_function_call(p):
+    """
+    postfix : Identifier LParen expression_list RParen
+    """
+    p[0] = Call(p[1], p[3])
+
+def p_param_list_single(p):
+    """
+    param_list : param
+    """
+    p[0] = [p[1]]
+
+def p_param_list_more(p):
+    """
+    param_list : param Comma param_list
+    """
+    p[0] = [p[1]] + p[3]
+
+def p_param_list_empty(p):
+    """
+    param_list : empty
+    """
+    p[0] = []
+    
+def p_param(p):
+    """
+    param : type Identifier
+    """
+    p[0] = Parameter(p[1], p[2])
+
+def p_expression_list_single(p):
+    """
+    expression_list : expression
+    """
+    p[0] = [p[1]]
+
+def p_expression_list_more(p):
+    """
+    expression_list : expression_list Comma expression
+    """
+    p[0] = p[1] + [p[3]]
+
+def p_expression_list_empty(p):
+    """
+    expression_list : empty
+    """
+    p[0] = []
 
 
 def p_block(p):
