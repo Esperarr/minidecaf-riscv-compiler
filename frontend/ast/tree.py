@@ -93,7 +93,7 @@ class Function(Node):
         )[key]
 
     def __len__(self) -> int:
-        return 3
+        return 3+len(self.params)
 
     def accept(self, v: Visitor[T, U], ctx: T):
         return v.visitFunction(self, ctx)
