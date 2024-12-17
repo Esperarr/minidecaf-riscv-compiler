@@ -114,6 +114,8 @@ class TACFuncEmitter(TACVisitor):
             self.func.add(Return(None))
         self.func.tempUsed = self.getUsedTemp()
         return self.func
+    def visitCall(self, dst:Temp, func: Label, args: List[Temp]) -> None:
+        self.func.add(Call(dst, func, args))
 
     # To open a new loop (for break/continue statements)
     def openLoop(self, breakLabel: Label, continueLabel: Label) -> None:
@@ -142,7 +144,8 @@ class TACGen(Visitor[TACFuncEmitter, None]):
         for funcName, astFunc in program.functions().items():
             # in step9, you need to use real parameter count
             emitter = TACFuncEmitter(FuncLabel(funcName), 0, labelManager)
-            astFunc.body.accept(self, emitter)
+            # astFunc.body.accept(self, emitter)
+            astFunc.accept(self, emitter)
             tacFuncs.append(emitter.visitEnd())
         return TACProg(tacFuncs)
 
@@ -316,3 +319,22 @@ class TACGen(Visitor[TACFuncEmitter, None]):
 
     def visitIntLiteral(self, expr: IntLiteral, mv: TACFuncEmitter) -> None:
         expr.setattr("val", mv.visitLoad(expr.value))
+
+    def visitParameter(self, param: Parameter, mv:TACFuncEmitter) -> None:
+        symbol= param.getattr("symbol")
+        symbol.temp= mv.freshTemp()
+        # print("symbol.temp:",symbol.temp)
+
+    def visitFunction(self, func: Function, mv: TACFuncEmitter) -> None:
+        for param in func.params:
+            param.accept(self, mv)
+        func.body.accept(self, mv)
+    
+    def visitCall(self, call: Call, mv: TACFuncEmitter) -> None:
+        dst=mv.freshTemp()
+        call.setattr('val', dst) 
+        func_name=call.ident.value
+        func=FuncLabel(func_name)
+        for arg in call.argument_list:
+            arg.accept(self, mv)
+        mv.visitCall(dst, func, args=[arg.getattr("val") for arg in call.argument_list])

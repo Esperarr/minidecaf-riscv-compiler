@@ -58,7 +58,7 @@ class Namer(Visitor[ScopeStack, None]):
                 else:# different type
                     raise DecafDeclConflictError(func_name)
         else:# func not decleared yet
-            func_symbol = FuncSymbol(func_type, func_name, GlobalScope)
+            func_symbol = FuncSymbol(func_name, func_type, GlobalScope)
             for param in func_param_list:
                 param_type=param.var_type
                 func_symbol.addParaType(param_type)
@@ -76,9 +76,9 @@ class Namer(Visitor[ScopeStack, None]):
 
     def visitCall(self, call: Call, ctx: ScopeStack) -> None:
         func_symbol=ctx.lookup_all(call.ident.value)
-        if not func_symbol or not isinstance(func_symbol, FuncSymbol) or not func_symbol.isFunc() or func_symbol.defined == False:
+        if not func_symbol or not isinstance(func_symbol, FuncSymbol) or not func_symbol.isFunc or func_symbol.defined == False:
             raise DecafUndefinedFuncError(call.ident.value)
-        if not (len(call.argument_list) == func_symbol.parameterNum()):
+        if not (len(call.argument_list) == func_symbol.parameterNum):
            raise DecafBadFuncCallError
         call.ident.setattr('symbol', func_symbol)
         for arg in call.argument_list:

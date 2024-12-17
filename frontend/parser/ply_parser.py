@@ -39,23 +39,39 @@ def p_empty(p: yacc.YaccProduction):
     pass
 
 
+# def p_program(p):
+#     """
+#     program : function_list
+#     """
+#     p[0] = Program(p[1])
+
+# def p_function_list(p):
+#     """
+#     function_list : function_list function
+#     """
+#     p[0] = p[1] + [p[2]]
+
+# def p_function_list_empty(p):
+#     """
+#     function_list : empty
+#     """
+#     p[0] = []
+
+def p_program_empty(p):
+    """
+    program : empty
+    """
+    p[0] = Program()
+    # pass
+
+
 def p_program(p):
     """
-    program : function_list
+    program : program function
     """
-    p[0] = Program(p[1])
-
-def p_function_list(p):
-    """
-    function_list : function_list function
-    """
-    p[0] = p[1] + [p[2]]
-
-def p_function_list_empty(p):
-    """
-    function_list : empty
-    """
-    p[0] = []
+    if p[2] is not NULL:
+        p[1].children.append(p[2])
+    p[0] = p[1]
 
 def p_type(p):
     """
