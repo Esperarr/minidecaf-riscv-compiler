@@ -143,7 +143,7 @@ class TACGen(Visitor[TACFuncEmitter, None]):
         tacFuncs = []
         for funcName, astFunc in program.functions().items():
             # in step9, you need to use real parameter count
-            emitter = TACFuncEmitter(FuncLabel(funcName), 0, labelManager)
+            emitter = TACFuncEmitter(FuncLabel(funcName), len(astFunc.params), labelManager)
             # astFunc.body.accept(self, emitter)
             astFunc.accept(self, emitter)
             tacFuncs.append(emitter.visitEnd())
