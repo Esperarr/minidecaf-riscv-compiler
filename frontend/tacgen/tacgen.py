@@ -323,6 +323,7 @@ class TACGen(Visitor[TACFuncEmitter, None]):
     def visitParameter(self, param: Parameter, mv:TACFuncEmitter) -> None:
         symbol= param.getattr("symbol")
         symbol.temp= mv.freshTemp()
+        mv.func.add_arg(symbol)
         # print("symbol.temp:",symbol.temp)
 
     def visitFunction(self, func: Function, mv: TACFuncEmitter) -> None:

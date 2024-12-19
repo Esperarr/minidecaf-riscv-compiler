@@ -199,3 +199,23 @@ class Riscv:
 
         def __str__(self) -> str:
             return "ret"
+        
+    class FPAdd(BackendInstr):
+        def __init__(self, offset: int) -> None:
+            super().__init__(InstrKind.SEQ, [Riscv.FP], [Riscv.SP], None)
+            self.offset = offset
+
+        def __str__(self) -> str:
+            assert -2048 <= self.offset <= 2047  # Riscv imm [11:0]
+            return "addi " + Riscv.FMT3.format(
+                str(Riscv.FP), str(Riscv.SP), str(self.offset)
+            )
+        
+    class Call(BackendInstr):
+        def __init__(self, target: Label) -> None:
+            super().__init__(InstrKind.CALL, [], [], target)
+            self.target = target
+
+        def __str__(self) -> str:
+            return "call " + str(self.target)
+        

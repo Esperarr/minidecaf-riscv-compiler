@@ -43,7 +43,7 @@ class RiscvAsmEmitter():
         for instr in func.getInstrSeq():
             instr.accept(selector)
 
-        info = SubroutineInfo(func.entry)
+        info = SubroutineInfo(func.entry, func.numArgs, func.args_temp)
 
         return (selector.seq, info)
 
@@ -129,6 +129,13 @@ class RiscvAsmEmitter():
         def visitAssign(self, instr: Assign) -> None:
             self.seq.append(Riscv.Move(instr.dst, instr.src))
         # in step9, you need to think about how to pass the parameters and how to store and restore callerSave regs
+        def visitCall(self, instr: Call) -> None:
+            for i in range(len(instr.args)):
+                arg = instr.args[i]
+                self.seq.append(Riscv.Move(arg, Riscv.ArgRegs[i]))
+            self.seq.append(Riscv.Call(instr.func.name))
+            self.seq.append(Riscv.Move(instr.dst, Riscv.A0))
+
         # in step11, you need to think about how to store the array 
 """
 RiscvAsmEmitter: an SubroutineEmitter for RiscV
@@ -187,6 +194,8 @@ class RiscvSubroutineEmitter():
     def emitLabel(self, label: Label):
         self.buf.append(Riscv.RiscvLabel(label))
 
+    def emitmv(self, dst: Reg, src: Reg):
+        self.buf.append(Riscv.Move(dst, src))
     
     def emitFunc(self):
         self.printer.printComment("start of prologue")
@@ -199,6 +208,9 @@ class RiscvSubroutineEmitter():
                 self.printer.printInstr(
                     Riscv.NativeStoreWord(Riscv.CalleeSaved[i], Riscv.SP, 4 * i)
                 )
+        self.printer.printInstr(Riscv.NativeStoreWord(Riscv.RA, Riscv.SP, 4*len(Riscv.CalleeSaved)))
+        self.printer.printInstr(Riscv.NativeStoreWord(Riscv.FP, Riscv.SP, 4*len(Riscv.CalleeSaved)+4))
+        self.printer.printInstr(Riscv.FPAdd(self.nextLocalOffset))
 
         self.printer.printComment("end of prologue")
         self.printer.println("")
@@ -225,6 +237,9 @@ class RiscvSubroutineEmitter():
                 self.printer.printInstr(
                     Riscv.NativeLoadWord(Riscv.CalleeSaved[i], Riscv.SP, 4 * i)
                 )
+
+        self.printer.printInstr(Riscv.NativeLoadWord(Riscv.RA, Riscv.SP, 4*len(Riscv.CalleeSaved)))
+        self.printer.printInstr(Riscv.NativeLoadWord(Riscv.FP, Riscv.SP, 4*len(Riscv.CalleeSaved)+4))
 
         self.printer.printInstr(Riscv.SPAdd(self.nextLocalOffset))
         self.printer.printComment("end of epilogue")
