@@ -132,7 +132,7 @@ class RiscvAsmEmitter():
         def visitCall(self, instr: Call) -> None:
             for i in range(len(instr.args)):
                 arg = instr.args[i]
-                self.seq.append(Riscv.Move(arg, Riscv.ArgRegs[i]))
+                self.seq.append(Riscv.Move(Riscv.ArgRegs[i], arg))
             self.seq.append(Riscv.Call(instr.func.name))
             self.seq.append(Riscv.Move(instr.dst, Riscv.A0))
 
@@ -147,7 +147,7 @@ class RiscvSubroutineEmitter():
         self.printer = emitter.printer
         
         # + 4 is for the RA reg 
-        self.nextLocalOffset = 4 * len(Riscv.CalleeSaved) + 4
+        self.nextLocalOffset = 4 * len(Riscv.CalleeSaved) + 8
         
         # the buf which stored all the NativeInstrs in this function
         self.buf: list[BackendInstr] = []

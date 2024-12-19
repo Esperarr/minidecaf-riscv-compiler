@@ -37,7 +37,15 @@ class Namer(Visitor[ScopeStack, None]):
         # Check if the 'main' function is missing
         if not program.hasMainFunc():
             raise DecafNoMainFuncError
-
+        
+        func_name_list=[]
+        for function in program.children:
+            function_name=function.ident.value
+            if function_name in func_name_list:
+                raise DecafDeclConflictError(function_name)
+            else:
+                func_name_list.append(function.ident.value)
+                
         for func in program.functions().values():
             func.accept(self, ctx)
 
