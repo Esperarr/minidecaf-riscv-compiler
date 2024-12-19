@@ -210,7 +210,7 @@ class Riscv:
             return "addi " + Riscv.FMT3.format(
                 str(Riscv.FP), str(Riscv.SP), str(self.offset)
             )
-        
+            
     class Call(BackendInstr):
         def __init__(self, target: Label) -> None:
             super().__init__(InstrKind.CALL, [], [], target)

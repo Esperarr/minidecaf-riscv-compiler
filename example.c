@@ -1,8 +1,12 @@
-int foo(int x) {
-    return x + 1;
+int fib(int n) {
+    if (n == 0 || n == 1) {
+        return n;
+    } else {
+        return fib(n - 1) + fib(n - 2);
+    }
 }
 
 int main() {
-    int a = 1;
-    return foo(a);
+    int n = 5;
+    return fib(n);
 }

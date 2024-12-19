@@ -9,6 +9,7 @@ from backend.riscv.riscvasmemitter import RiscvSubroutineEmitter
 from backend.subroutineinfo import SubroutineInfo
 from utils.riscv import Riscv
 from utils.tac.reg import Reg
+from utils.tac.tacop import InstrKind
 from utils.tac.temp import Temp
 
 """
@@ -68,6 +69,13 @@ class BruteRegAlloc(RegAlloc):
             subEmitter.emitComment(str(loc.instr))
 
             self.allocForLoc(loc, subEmitter)
+            # if loc.instr.kind == InstrKind.CALL:
+            #     for arg_temp in loc.instr.srcs:
+            #         self.unbind(arg_temp)
+            #         self.bind(arg_temp, Riscv.ArgRegs[arg_temp.index])
+            #     for dst_temp in loc.instr.dsts:
+            #         self.unbind(dst_temp)
+            #         self.bind(dst_temp, Riscv.A0)
 
         for tempindex in bb.liveOut:
             if tempindex in self.bindings:
@@ -86,11 +94,13 @@ class BruteRegAlloc(RegAlloc):
         if isinstance(instr, Riscv.Call):
             for caller_saved_reg in Riscv.CallerSaved:
                 if caller_saved_reg.isUsed():
+                    if caller_saved_reg == Riscv.A0:
+                        continue
                     subEmitter.emitStoreToStack(caller_saved_reg)
                     temp = caller_saved_reg.temp
                     if temp is not None:
                         self.unbind(temp)
-                        
+
         for i in range(len(instr.srcs)):
             temp = instr.srcs[i]
             if isinstance(temp, Reg):
