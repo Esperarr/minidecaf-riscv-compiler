@@ -13,3 +13,6 @@ parsetab.py
 
 # test
 test*
+
+# generated compiler output
+*.s
